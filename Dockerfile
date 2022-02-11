@@ -1,11 +1,21 @@
 FROM golang:1.17.0-alpine AS builder
-RUN apk add --no-cache git
-RUN GO111MODULE=on go get -v github.com/projectdiscovery/httpx/cmd/httpx
+WORKDIR /go/src/httpx
+ADD go.mod .
+ADD go.sum .
+RUN go mod download
+ADD . .
+RUN go build -v -ldflags="-s -w" -o "/httpx" cmd/httpx/httpx.go
 
-FROM alpine:latest
 
-RUN apk -U upgrade --no-cache \
-    && apk add --no-cache bind-tools ca-certificates
-COPY --from=builder /go/bin/httpx /usr/local/bin/
+FROM alpine:3.12
 
-ENTRYPOINT ["httpx"]
+RUN apk add --no-cache bind-tools ca-certificates
+
+COPY --from=builder /httpx /httpx
+
+VOLUME /input
+VOLUME /output
+
+# any of these flags can be overriden with docker run args using "=false"
+# example (disable pipeline probe): docker run httpx -pipeline=false
+ENTRYPOINT [ "/httpx", "-silent", "-json", "-no-fallback", "-pipeline", "-response-in-json", "-tech-detect", "-output", "/output" ]

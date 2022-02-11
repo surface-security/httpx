@@ -12,7 +12,7 @@ const banner = `
 `
 
 // Version is the current version of httpx
-const Version = `v1.1.2`
+const Version = `v1.1.2-ppb`
 
 // showBanner is used to show the banner to the user
 func showBanner() {

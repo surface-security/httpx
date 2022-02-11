@@ -177,12 +177,14 @@ type Options struct {
 	protocol                  string
 	ShowStatistics            bool
 	RandomAgent               bool
+	// SURF: new options
+	OutputDirectory           string
+	OutputExtractRegex        string
 	StoreChain                bool
 	Deny                      customlist.CustomList
 	Allow                     customlist.CustomList
 	MaxResponseBodySizeToSave int
 	MaxResponseBodySizeToRead int
-	OutputExtractRegex        string
 	RateLimit                 int
 	Probe                     bool
 	Resume                    bool
@@ -255,7 +257,8 @@ func ParseOptions() *Options {
 	flag.BoolVar(&options.NoFallback, "no-fallback", false, "Probe both protocol (HTTPS and HTTP)")
 	flag.BoolVar(&options.NoFallbackScheme, "no-fallback-scheme", false, "Probe with input protocol scheme")
 	flag.BoolVar(&options.ShowStatistics, "stats", false, "Enable statistic on keypress (terminal may become unresponsive till the end)")
-	flag.BoolVar(&options.RandomAgent, "random-agent", true, "Use randomly selected HTTP User-Agent header value")
+	flag.BoolVar(&options.RandomAgent, "random-agent", false, "Use randomly selected HTTP User-Agent header value")
+	flag.StringVar(&options.OutputDirectory, "output", "", "Directory to store JSON results (instead of single file as -o)")
 	flag.BoolVar(&options.StoreChain, "store-chain", false, "Save chain to file (default 'output')")
 	flag.Var(&options.Allow, "allow", "Allow list of IP/CIDR's to process (file or comma separated)")
 	flag.Var(&options.Deny, "deny", "Deny list of IP/CIDR's to process (file or comma separated)")
@@ -269,6 +272,11 @@ func ParseOptions() *Options {
 	flag.IntVar(&options.HostMaxErrors, "max-host-error", 30, "Max error count per host before skipping remaining path/s")
 
 	flag.Parse()
+
+	if flag.Arg(0) != "" {
+		// SURF: support inputfile as positional arg
+		options.InputFile = flag.Arg(0)
+	}
 
 	// Read the inputs and configure the logging
 	options.configureOutput()

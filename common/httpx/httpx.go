@@ -230,6 +230,8 @@ get_response:
 
 	resp.Duration = time.Since(timeStart)
 
+	resp.FinalURL = httpresp.Request.URL.String()
+
 	return &resp, nil
 }
 

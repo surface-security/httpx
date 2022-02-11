@@ -408,6 +408,11 @@ func (r *Runner) RunEnumeration() {
 			gologger.Fatal().Msgf("Could not create output directory '%s': %s\n", r.options.StoreResponseDir, err)
 		}
 	}
+	if r.options.OutputDirectory != "" && !fileutil.FolderExists(r.options.OutputDirectory) {
+		if err := os.MkdirAll(r.options.OutputDirectory, os.ModePerm); err != nil {
+			gologger.Fatal().Msgf("Could not create output directory '%s': %s\n", r.options.OutputDirectory, err)
+		}
+	}
 
 	r.prepareInput()
 
@@ -470,10 +475,31 @@ func (r *Runner) RunEnumeration() {
 			if r.options.JSONOutput {
 				row = resp.JSON(&r.scanopts)
 			}
-			gologger.Silent().Msgf("%s\n", row)
 			if f != nil {
 				//nolint:errcheck // this method needs a small refactor to reduce complexity
 				f.WriteString(row + "\n")
+			}
+			// SURF - store results individually - same logic as StoreResponse
+			// store results in directory
+			if r.options.OutputDirectory != "" {
+				domainFile := fmt.Sprintf("%s.%s", resp.Domain, resp.Port)
+				// On various OS the file max file name length is 255 - https://serverfault.com/questions/9546/filename-length-limits-on-linux
+				// Truncating length at 255
+				if len(domainFile) >= maxFileNameLength {
+					// leaving last 4 bytes free to append ".txt"
+					domainFile = domainFile[:maxFileNameLength-1]
+				}
+
+				domainFile = strings.ReplaceAll(domainFile, "/", "_") + ".json"
+				responsePath := path.Join(r.options.OutputDirectory, domainFile)
+				writeErr := ioutil.WriteFile(responsePath, []byte(row), 0644)
+				if writeErr != nil {
+					gologger.Warning().Msgf("Could not write results, at path '%s', to disk: %s", responsePath, writeErr)
+				}
+				gologger.Silent().Msgf("[+] Baselined %s\n", resp.URL)
+			} else {
+				// SURF - only print row if not saving to file...
+				gologger.Silent().Msgf("%s\n", row)
 			}
 		}
 	}(output)
@@ -726,6 +752,15 @@ retry:
 	// fix the final output url
 	fullURL := req.URL.String()
 	parsedURL, _ := urlutil.Parse(fullURL)
+
+	inputPort := parsedURL.Port
+	if inputPort == "" {
+		if parsedURL.Scheme == "http" {
+			inputPort = "80"
+		} else {
+			inputPort = "443"
+		}
+	}
 	if r.options.Unsafe {
 		parsedURL.RequestURI = reqURI
 		// if the full url doesn't end with the custom path we pick the original input value
@@ -783,7 +818,7 @@ retry:
 		}
 
 		if r.options.Probe {
-			return Result{URL: URL.String(), Input: origInput, Timestamp: time.Now(), err: err, Failed: err != nil, Error: errString, str: builder.String()}
+			return Result{URL: URL.String(), Input: origInput, Timestamp: time.Now(), err: err, Failed: err != nil, Error: errString, str: builder.String(), Domain: domain, Port: inputPort}
 		} else {
 			return Result{URL: URL.String(), Input: origInput, Timestamp: time.Now(), err: err}
 		}
@@ -1098,7 +1133,8 @@ retry:
 		CDN:              isCDN,
 		ResponseTime:     resp.Duration.String(),
 		Technologies:     technologies,
-		FinalURL:         finalURL,
+		Domain:           domain,
+		FinalURL:         resp.FinalURL,
 	}
 }
 
@@ -1129,6 +1165,7 @@ type Result struct {
 	Title            string `json:"title,omitempty"`
 	str              string
 	err              error
+	Domain           string              `json:"domain,omitempty"`
 	Error            string              `json:"error,omitempty"`
 	WebServer        string              `json:"webserver,omitempty"`
 	ResponseBody     string              `json:"response-body,omitempty"`
