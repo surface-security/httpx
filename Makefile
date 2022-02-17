@@ -1,14 +1,7 @@
-# Go parameters
-GOCMD=go
-GOBUILD=$(GOCMD) build
-GOMOD=$(GOCMD) mod
-GOTEST=$(GOCMD) test
-GOGET=$(GOCMD) get
-    
-all: build
+all: test
+
 build:
-		$(GOBUILD) -v -ldflags="-extldflags=-static" -o "httpx" cmd/httpx/httpx.go
-test: 
-		$(GOTEST) -v ./...
-tidy:
-		$(GOMOD) tidy
+	docker build -t tmp-$(notdir $(CURDIR)) .
+
+test: build
+	test/run.sh tmp-$(notdir $(CURDIR))
