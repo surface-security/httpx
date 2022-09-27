@@ -8,7 +8,6 @@ cd ..
 NAME=${1}
 shift
 
-echo "$NAME"
 rm -fr test/output
 
 docker run --rm \
