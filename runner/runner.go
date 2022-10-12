@@ -713,6 +713,34 @@ func (r *Runner) RunEnumeration() {
 				//nolint:errcheck // this method needs a small refactor to reduce complexity
 				f.WriteString(row + "\n")
 			}
+
+			// SURF - store results individually - same logic as StoreResponse
+			// store results in directory
+			if r.options.Output != "" {
+				var domainFile string = ""
+				if resp.Domain == "" {
+					domainFile = resp.Input
+				} else {
+					domainFile = fmt.Sprintf("%s.%s", resp.Domain, resp.Port)
+				}
+				// On various OS the file max file name length is 255 - https://serverfault.com/questions/9546/filename-length-limits-on-linux
+				// Truncating length at 255
+				if len(domainFile) >= maxFileNameLength {
+					// leaving last 4 bytes free to append ".txt"
+					domainFile = domainFile[:maxFileNameLength-1]
+				}
+
+				domainFile = strings.ReplaceAll(domainFile, "/", "_") + ".json"
+				responsePath := path.Join(r.options.Output, domainFile)
+				writeErr := ioutil.WriteFile(responsePath, []byte(row), 0644)
+				if writeErr != nil {
+					gologger.Warning().Msgf("Could not write results, at path '%s', to disk: %s", responsePath, writeErr)
+				}
+				gologger.Silent().Msgf("[+] Baselined %s\n", resp.URL)
+			} else {
+				// SURF - only print row if not saving to file...
+				gologger.Silent().Msgf("%s\n", row)
+			}
 		}
 	}(output)
 
@@ -1095,7 +1123,7 @@ retry:
 		}
 
 		if r.options.Probe {
-			return Result{URL: URL.String(), Input: origInput, Timestamp: time.Now(), err: err, Failed: err != nil, Error: errString, str: builder.String()}
+			return Result{URL: URL.String(), Input: origInput, Timestamp: time.Now(), err: err, Failed: err != nil, Error: errString, str: builder.String(), Domain: target.CustomHost, Port: URL.Port}
 		} else {
 			return Result{URL: URL.String(), Input: origInput, Timestamp: time.Now(), err: err}
 		}
@@ -1580,6 +1608,7 @@ type Result struct {
 	ContentType      string              `json:"content-type,omitempty" csv:"content-type"`
 	Method           string              `json:"method,omitempty" csv:"method"`
 	Host             string              `json:"host,omitempty" csv:"host"`
+	Domain           string              `json:"domain,omitempty" csv:"domain"`
 	Path             string              `json:"path,omitempty" csv:"path"`
 	FavIconMMH3      string              `json:"favicon-mmh3,omitempty" csv:"favicon-mmh3"`
 	FinalURL         string              `json:"final-url,omitempty" csv:"final-url"`
