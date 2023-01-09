@@ -18,9 +18,11 @@ jobs:
       id: sync
       uses: surface-security/scanner-httpx@main
       with:
-        target_sync_branch: new_branch
-        upstream_sync_branch: main
-        upstream_sync_repo: projectdiscovery/httpx.git
+        upstream_repository: projectdiscovery/httpx.git
+        upstream_branch: main
+        target_branch: new_branch                   
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        
 
     - name: New commits found
       if: steps.sync.outputs.has_new_commits == 'true'
