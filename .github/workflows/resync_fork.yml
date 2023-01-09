@@ -10,9 +10,9 @@ jobs:
 
     steps:
     - name: Checkout target repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
       with:
-        ref: new_branch
+        ref: main
        
     - name: Sync upstream changes
       id: sync
