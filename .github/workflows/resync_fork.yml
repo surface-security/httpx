@@ -16,7 +16,7 @@ jobs:
        
     - name: Sync upstream changes
       id: sync
-      uses: surface-security/httpx@main
+      uses: surface-security/scanner-httpx@main
       with:
         target_sync_branch: new_branch
         upstream_sync_branch: main
