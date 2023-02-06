@@ -1,4 +1,8 @@
 # httpx
+<h1 align="center">
+  <img src="static/httpx-logo.png" alt="httpx" width="200px">
+  <br>
+</h1>
 
 This scanner performs several probes on targets.
 

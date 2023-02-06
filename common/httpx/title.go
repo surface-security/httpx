@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	stringsutil "github.com/projectdiscovery/utils/strings"
 	"golang.org/x/net/html"
 )
 
@@ -34,44 +35,9 @@ func ExtractTitle(r *Response) (title string) {
 
 	// remove unwanted chars
 	title = strings.TrimSpace(strings.Trim(title, cutset))
+	title = stringsutil.ReplaceAll(title, "\n", "\r")
 
-	// Non UTF-8
-	if contentTypes, ok := r.Headers["Content-Type"]; ok {
-		contentType := strings.Join(contentTypes, ";")
-
-		// special cases
-		if strings.Contains(strings.ToLower(contentType), "charset=gb2312") ||
-			strings.Contains(strings.ToLower(contentType), "charset=gbk") {
-			titleUtf8, err := Decodegbk([]byte(title))
-			if err != nil {
-				return
-			}
-
-			return string(titleUtf8)
-		}
-
-		// Content-Type from head tag
-		var match = reContentType.FindSubmatch(r.Data)
-		var mcontentType = ""
-		if len(match) != 0 {
-			for i, v := range match {
-				if string(v) != "" && i != 0 {
-					mcontentType = string(v)
-				}
-			}
-			mcontentType = strings.ToLower(mcontentType)
-		}
-		if strings.Contains(mcontentType, "gb2312") || strings.Contains(mcontentType, "gbk") {
-			titleUtf8, err := Decodegbk([]byte(title))
-			if err != nil {
-				return
-			}
-
-			return string(titleUtf8)
-		}
-	}
-
-	return //nolint
+	return title
 }
 
 func getTitleWithDom(r *Response) (*html.Node, error) {
@@ -82,7 +48,7 @@ func getTitleWithDom(r *Response) (*html.Node, error) {
 			title = node
 			return
 		}
-		for child := node.FirstChild; child != nil; child = child.NextSibling {
+		for child := node.FirstChild; child != nil && title == nil; child = child.NextSibling {
 			crawler(child)
 		}
 	}
