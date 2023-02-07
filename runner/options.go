@@ -1,7 +1,6 @@
 package runner
 
 import (
-	"flag"
 	"fmt"
 	"math"
 	"os"
@@ -426,9 +425,9 @@ func ParseOptions() *Options {
 		options.ShowStatistics = true
 	}
 
-	if flag.Arg(0) != "" {
+	if flagSet.CommandLine.Arg(0) != "" {
 		// SURF: support inputfile as positional arg
-		options.InputFile = flag.Arg(0)
+		options.InputFile = flagSet.CommandLine.Arg(0)
 	}
 
 	// Read the inputs and configure the logging
