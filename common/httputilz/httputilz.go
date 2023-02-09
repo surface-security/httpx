@@ -3,12 +3,12 @@ package httputilz
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http/httputil"
 	"strings"
 
 	"github.com/projectdiscovery/retryablehttp-go"
-	"github.com/projectdiscovery/urlutil"
+	urlutil "github.com/projectdiscovery/utils/url"
 )
 
 const (
@@ -87,7 +87,7 @@ func ParseRequest(req string, unsafe bool) (method, path string, headers map[str
 	}
 
 	// Set the request body
-	b, err := ioutil.ReadAll(reader)
+	b, err := io.ReadAll(reader)
 	if err != nil {
 		err = fmt.Errorf("could not read request body: %s", err)
 		return

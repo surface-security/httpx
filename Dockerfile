@@ -1,10 +1,10 @@
-FROM golang:1.17.0-alpine AS builder
+FROM golang:1.19.4-alpine AS builder
 WORKDIR /go/src/httpx
 ADD go.mod .
 ADD go.sum .
 RUN go mod download
 ADD . .
-RUN go build -v -ldflags="-s -w" -o "/httpx" cmd/httpx/httpx.go
+RUN CGO_ENABLED=0 go build -v -ldflags="-s -w" -o "/httpx" cmd/httpx/httpx.go
 
 
 FROM alpine:3.12
