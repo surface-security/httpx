@@ -31,7 +31,6 @@ const (
 	two                    = 2
 	DefaultResumeFile      = "resume.cfg"
 	DefaultOutputDirectory = "output"
-	maxFileNameLength      = 255
 )
 
 var defaultProviders = strings.Join(cdncheck.GetDefaultProviders(), ", ")
@@ -214,9 +213,6 @@ type Options struct {
 	ShowStatistics            bool
 	StatsInterval             int
 	RandomAgent               bool
-	// SURF: new options
-	OutputDirectory           string
-	OutputExtractRegex        string
 	StoreChain                bool
 	Deny                      customlist.CustomList
 	Allow                     customlist.CustomList
@@ -353,7 +349,7 @@ func ParseOptions() *Options {
 	)
 
 	flagSet.CreateGroup("output", "Output",
-		flagSet.StringVarP(&options.Output, "", "o", "", "file to write output results"),
+		flagSet.StringVarP(&options.Output, "", "output", "", "file to write output results"),
 		flagSet.BoolVarP(&options.StoreResponse, "store-response", "sr", false, "store http response to output directory"),
 		flagSet.StringVarP(&options.StoreResponseDir, "store-response-dir", "srd", "", "store http response to custom directory"),
 		flagSet.BoolVar(&options.CSVOutput, "csv", false, "store output in csv format"),
@@ -363,7 +359,6 @@ func ParseOptions() *Options {
 		flagSet.BoolVarP(&options.base64responseInStdout, "include-response-base64", "irrb", false, "include base64 encoded http request/response in JSON output (-json only)"),
 		flagSet.BoolVar(&options.chainInStdout, "include-chain", false, "include redirect http chain in JSON output (-json only)"),
 		flagSet.BoolVar(&options.StoreChain, "store-chain", false, "include http redirect chain in responses (-sr only)"),
-		flagSet.StringVar(&options.OutputDirectory, "output", "", "Directory to store JSON results (instead of single file as -o)"),
 	)
 
 	flagSet.CreateGroup("configs", "Configurations",
@@ -423,11 +418,6 @@ func ParseOptions() *Options {
 
 	if options.StatsInterval != 0 {
 		options.ShowStatistics = true
-	}
-
-	if flagSet.CommandLine.Arg(0) != "" {
-		// SURF: support inputfile as positional arg
-		options.InputFile = flagSet.CommandLine.Arg(0)
 	}
 
 	// Read the inputs and configure the logging
