@@ -356,7 +356,7 @@ func ParseOptions() *Options {
 	)
 
 	flagSet.CreateGroup("output", "Output",
-		flagSet.StringVarP(&options.Output, "output", "o", "", "file to write output results"),
+		flagSet.StringVarP(&options.Output, "", "output", "", "file to write output results"),
 		flagSet.BoolVarP(&options.StoreResponse, "store-response", "sr", false, "store http response to output directory"),
 		flagSet.StringVarP(&options.StoreResponseDir, "store-response-dir", "srd", "", "store http response to custom directory"),
 		flagSet.BoolVar(&options.CSVOutput, "csv", false, "store output in csv format"),

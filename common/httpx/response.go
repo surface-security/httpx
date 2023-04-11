@@ -23,6 +23,7 @@ type Response struct {
 	HTTP2         bool
 	Pipeline      bool
 	Duration      time.Duration
+	FinalURL      string
 	Chain         []httputil.ChainItem
 }
 

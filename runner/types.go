@@ -73,6 +73,7 @@ type Result struct {
 	HTTP2              bool                   `json:"http2,omitempty" csv:"http2"`
 	Pipeline           bool                   `json:"pipeline,omitempty" csv:"pipeline"`
 	StoredResponsePath string                 `json:"stored_response_path,omitempty" csv:"stored_response_path"`
+	Domain             string                 `json:"domain,omitempty"`
 }
 
 // function to get dsl variables from result struct
