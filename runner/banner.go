@@ -1,10 +1,9 @@
 package runner
 
 import (
-    "github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/gologger"
 	updateutils "github.com/projectdiscovery/utils/update"
 )
-
 
 const banner = `
     __    __  __       _  __
@@ -16,7 +15,7 @@ const banner = `
 `
 
 // Version is the current version of httpx
-const version = `v1.2.9-ppb`
+var version = `v1.2.9`
 
 // showBanner is used to show the banner to the user
 func showBanner() {
