@@ -36,11 +36,11 @@ checksum:
 
 announce:
   slack:
-    enabled: true
+    enabled: false
     channel: '#release'
     username: GoReleaser
     message_template: 'New Release: {{ .ProjectName }} {{ .Tag }} is published! Check it out at {{ .ReleaseURL }}'
 
   discord:
-    enabled: true
+    enabled: false
     message_template: '**New Release: {{ .ProjectName }} {{.Tag}}** is published! Check it out at {{ .ReleaseURL }}'
