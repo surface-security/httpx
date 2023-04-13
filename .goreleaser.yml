@@ -11,7 +11,7 @@ builds:
     - darwin
   goarch:
     - amd64
-    - 386
+    - '386'
     - arm
     - arm64
 
@@ -25,6 +25,8 @@ builds:
 
   binary: '{{ .ProjectName }}'
   main: cmd/httpx/httpx.go
+
+  ldflags: '-s -w -X github.com/projectdiscovery/httpx/runner.version={{.Version}}'
 
 archives:
 - format: zip
