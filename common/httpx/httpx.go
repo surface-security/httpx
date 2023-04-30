@@ -267,6 +267,7 @@ get_response:
 			return nil, err
 		}
 		resp.Chain = chain
+		resp.FinalURL = httpresp.Request.URL.String()
 	}
 
 	resp.Duration = time.Since(timeStart)

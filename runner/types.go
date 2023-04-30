@@ -76,6 +76,7 @@ type Result struct {
 	ScreenshotBytes    []byte                 `json:"screenshot_bytes,omitempty" csv:"screenshot_bytes"`
 	StoredResponsePath string                 `json:"stored_response_path,omitempty" csv:"stored_response_path"`
 	ScreenshotPath     string                 `json:"screenshot_path,omitempty" csv:"screenshot_path"`
+	Domain             string                 `json:"domain,omitempty"`
 }
 
 // function to get dsl variables from result struct

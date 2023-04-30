@@ -1180,9 +1180,17 @@ retry:
 	}
 	// fix the final output url
 	fullURL := req.URL.String()
+	inputPort := ""
 	if parsedURL, errParse := r.parseURL(fullURL); errParse != nil {
 		return Result{URL: URL.String(), Input: origInput, err: errParse}
 	} else {
+		if inputPort == "" {
+			if parsedURL.Scheme == "http" {
+				inputPort = "80"
+			} else {
+				inputPort = "443"
+			}
+		}
 		if r.options.Unsafe {
 			parsedURL.Path = reqURI
 			// if the full url doesn't end with the custom path we pick the original input value
@@ -1249,7 +1257,7 @@ retry:
 		}
 
 		if r.options.Probe {
-			return Result{URL: URL.String(), Input: origInput, Timestamp: time.Now(), err: err, Failed: err != nil, Error: errString, str: builder.String()}
+			return Result{URL: URL.String(), Input: origInput, Timestamp: time.Now(), err: err, Failed: err != nil, Error: errString, str: builder.String(), Domain: target.Host, Port: inputPort}
 		} else {
 			return Result{URL: URL.String(), Input: origInput, Timestamp: time.Now(), err: err}
 		}
@@ -1731,7 +1739,6 @@ retry:
 		CDNName:            cdnName,
 		ResponseTime:       resp.Duration.String(),
 		Technologies:       technologies,
-		FinalURL:           finalURL,
 		FavIconMMH3:        faviconMMH3,
 		FaviconPath:        faviconPath,
 		Hashes:             hashesMap,
@@ -1745,6 +1752,8 @@ retry:
 		ScreenshotBytes:    screenshotBytes,
 		ScreenshotPath:     screenshotPath,
 		HeadlessBody:       headlessBody,
+		Domain:             target.Host,
+		FinalURL:           resp.FinalURL,
 	}
 	if r.options.OnResult != nil {
 		r.options.OnResult(result)
