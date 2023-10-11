@@ -29,9 +29,9 @@ require (
 	github.com/remeh/sizedwaitgroup v1.0.0
 	github.com/rs/xid v1.4.0
 	go.etcd.io/bbolt v1.3.7 // indirect
-	golang.org/x/net v0.8.0
-	golang.org/x/sys v0.6.0 // indirect
-	golang.org/x/text v0.8.0
+	golang.org/x/net v0.17.0
+	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/text v0.13.0
 )
 
 require github.com/spaolacci/murmur3 v1.1.0
@@ -116,7 +116,7 @@ require (
 	github.com/zmap/rc2 v0.0.0-20190804163417-abaa70531248 // indirect
 	github.com/zmap/zcertificate v0.0.0-20180516150559-0e3d58b1bac4 // indirect
 	github.com/zmap/zcrypto v0.0.0-20230205235340-d51ce4775101 // indirect
-	golang.org/x/crypto v0.7.0 // indirect
+	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/oauth2 v0.5.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
